@@ -38,7 +38,7 @@ class Participant:
         self._average = value
 
     def add_score(self, score):
-        self.scores += score
+        self.scores.append(score)
 
     def calc_average(self):
         self.average = sum(self.scores) / len(self.scores)
