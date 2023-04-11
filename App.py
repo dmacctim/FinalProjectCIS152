@@ -49,7 +49,7 @@ class App:
 
     def popup_participant(self):
         self.add_participant_window = tkinter.Toplevel(self.main_window)
-        self.add_participant_window.wm_geometry('400x100')
+        self.add_participant_window.wm_geometry('400x120')
 
         participant_name_label = tkinter.Label(self.add_participant_window, text='Participant Name: ')
         participant_name_label.grid(row=1, column=1, padx=(10, 0), pady=10)
@@ -58,22 +58,26 @@ class App:
         participant_entry.grid(row=1, column=2, padx=(0, 10), pady=10)
 
         submit_participant_button = tkinter.Button(self.add_participant_window, text=f'Add Participant', font=self.FONT,
-                                                   command=lambda: [self.add_participant(participant_entry.get()),
-                                                                    self.add_participant_window.destroy()])
+                                                   command=lambda: self.add_participant(participant_entry.get()))
         submit_participant_button.grid(row=2, column=1, padx=(50, 0), pady=10)
         cancel_button = tkinter.Button(self.add_participant_window, text='Cancel', font=self.FONT,
                                        command=self.add_participant_window.destroy)
         cancel_button.grid(row=2, column=2, pady=10)
 
     def add_participant(self, participant_name):
-        participant_name = participant_name.title()
-        event_index = self.event_names.index(self.clicked_event.get())
-        participant_id = next(self.participant_id_gen)
-        participant_to_add = Participant(participant_name, participant_id)
-        self.events[event_index].add_participant(participant_to_add)
-        self.participant_listbox.delete(0, tkinter.END)
-        for curr_participant in self.events[event_index].participants:
-            self.participant_listbox.insert(tkinter.END, curr_participant.name)
+        if participant_name:
+            participant_name = participant_name.title()
+            event_index = self.event_names.index(self.clicked_event.get())
+            participant_id = next(self.participant_id_gen)
+            participant_to_add = Participant(participant_name, participant_id)
+            self.events[event_index].add_participant(participant_to_add)
+            self.participant_listbox.delete(0, tkinter.END)
+            for curr_participant in self.events[event_index].participants:
+                self.participant_listbox.insert(tkinter.END, curr_participant.name)
+            self.add_participant_window.destroy()
+        else:
+            empty_name_label = tkinter.Label(self.add_participant_window, text='Name cannot be empty', fg='#f00')
+            empty_name_label.grid(row=3, column=1, columnspan=2)
 
     def popup_times(self):
         selected_participant = self.participant_listbox.curselection()[0]
@@ -114,19 +118,23 @@ class App:
         cancel_button.grid(row=6, column=2, pady=10)
 
     def add_times(self, participant_index, times):
-        if all([time.replace('.', '', 1).isnumeric() for time in times]):
-            event = self.events[self.event_names.index(self.clicked_event.get())]
-            participant = event.participants[participant_index]
-            if not participant.scores:
-                for time in times:
-                    participant.add_score(time)
-                self.add_times_window.destroy()
-            else:
-                times_already_exist_label = tkinter.Label(self.add_times_window,
-                                                          text='Time entries already exist for this participant',
-                                                          fg='#f00')
-                times_already_exist_label.grid(row=7, column=1, columnspan=2)
+        if not all(times):
+            empty_times_label = tkinter.Label(self.add_times_window, text='Time entries cannot be empty', fg='#f00')
+            empty_times_label.grid(row=7, column=1, columnspan=2)
         else:
-            times_input_val_label = tkinter.Label(self.add_times_window, text='Time entries must only be numbers',
-                                                  fg='#f00')
-            times_input_val_label.grid(row=7, column=1, columnspan=2)
+            if all([time.replace('.', '', 1).isnumeric() for time in times]):
+                event = self.events[self.event_names.index(self.clicked_event.get())]
+                participant = event.participants[participant_index]
+                if not participant.scores:
+                    for time in times:
+                        participant.add_score(time)
+                    self.add_times_window.destroy()
+                else:
+                    times_already_exist_label = tkinter.Label(self.add_times_window,
+                                                              text='Time entries already exist for this participant',
+                                                              fg='#f00')
+                    times_already_exist_label.grid(row=7, column=1, columnspan=2)
+            else:
+                times_input_val_label = tkinter.Label(self.add_times_window, text='Time entries must only be numbers',
+                                                      fg='#f00')
+                times_input_val_label.grid(row=7, column=1, columnspan=2)
