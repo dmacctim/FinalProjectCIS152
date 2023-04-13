@@ -1,5 +1,4 @@
 from collections import deque
-from Participant import Participant
 
 
 class Event:

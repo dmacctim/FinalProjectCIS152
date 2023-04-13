@@ -27,19 +27,34 @@ class App:
         self.clicked_event.set(self.event_names[0])
 
         self.event_label = tkinter.Label(self.frame, text='Event: ', font=self.FONT)
-        self.event_label.grid(row=0, column=0)
+        self.event_label.grid(row=0, column=0, rowspan=2)
         self.event_dropdown = tkinter.OptionMenu(self.frame, self.clicked_event, *self.event_names,
                                                  command=self.update_participants_listbox)
-        self.event_dropdown.grid(row=0, column=1)
+        self.event_dropdown.grid(row=0, column=1, rowspan=2)
         self.participant_label = tkinter.Label(self.frame, text='Participants', font=self.FONT)
         self.participant_label.grid(row=2, column=0, columnspan=2, pady=(40, 0))
         self.participant_listbox = tkinter.Listbox(self.frame, font=self.FONT, selectmode='SINGLE')
-        self.participant_listbox.grid(row=3, column=0, columnspan=2)
+        self.participant_listbox.grid(row=3, column=0, columnspan=2, rowspan=3)
         self.add_participant_button = tkinter.Button(self.frame, text='Add Participant', font=self.FONT,
                                                      command=self.popup_participant)
-        self.add_participant_button.grid(row=4, column=0, columnspan=2)
+        self.add_participant_button.grid(row=6, column=0, columnspan=2)
         self.add_times_button = tkinter.Button(self.frame, text='Add Times', font=self.FONT, command=self.popup_times)
-        self.add_times_button.grid(row=5, column=0, columnspan=2)
+        self.add_times_button.grid(row=7, column=0, columnspan=2)
+        self.determine_winners_button = tkinter.Button(self.frame, text='Determine Winners', font=self.FONT,
+                                                       command=self.display_winners)
+        self.determine_winners_button.grid(row=8, column=0, columnspan=2, pady=40)
+        self.two_by_two_results_label = tkinter.Label(self.frame, text='2x2 Results', font=self.FONT)
+        self.three_by_three_results_label = tkinter.Label(self.frame, text='3x3 Results', font=self.FONT)
+        self.four_by_four_results_label = tkinter.Label(self.frame, text='4x4 Results', font=self.FONT)
+        self.five_by_five_results_label = tkinter.Label(self.frame, text='5x5 Results', font=self.FONT)
+        self.six_by_six_results_label = tkinter.Label(self.frame, text='6x6 Results', font=self.FONT)
+        self.seven_by_seven_results_label = tkinter.Label(self.frame, text='7x7 Results', font=self.FONT)
+        self.two_by_two_results_label.grid(row=0, column=2, columnspan=2, padx=70)
+        self.three_by_three_results_label.grid(row=0, column=4, columnspan=2, padx=70)
+        self.four_by_four_results_label.grid(row=0, column=6, columnspan=2, padx=70)
+        self.five_by_five_results_label.grid(row=4, column=2, columnspan=2, padx=70)
+        self.six_by_six_results_label.grid(row=4, column=4, columnspan=2, padx=70)
+        self.seven_by_seven_results_label.grid(row=4, column=6, columnspan=2, padx=70)
 
     def update_participants_listbox(self, event):
         selected_event_index = self.event_names.index(self.clicked_event.get())
@@ -125,9 +140,9 @@ class App:
             if all([time.replace('.', '', 1).isnumeric() for time in times]):
                 event = self.events[self.event_names.index(self.clicked_event.get())]
                 participant = event.participants[participant_index]
-                if not participant.scores:
+                if not participant.times:
                     for time in times:
-                        participant.add_score(time)
+                        participant.add_time(time)
                     self.add_times_window.destroy()
                 else:
                     times_already_exist_label = tkinter.Label(self.add_times_window,
@@ -138,3 +153,23 @@ class App:
                 times_input_val_label = tkinter.Label(self.add_times_window, text='Time entries must only be numbers',
                                                       fg='#f00')
                 times_input_val_label.grid(row=7, column=1, columnspan=2)
+
+    def display_winners(self):
+        event = self.events[self.event_names.index(self.clicked_event.get())]
+
+        if event.all_times_entered():
+            # process and display winners
+            pass
+        else:
+            self.display_remaining_participants(event.get_remaining_participants())
+
+    def display_remaining_participants(self, remaining_participants):
+        remaining_participants_window = tkinter.Toplevel(self.main_window)
+        remaining_participants_window.wm_geometry('400x300')
+
+        remaining_participants_label = tkinter.Label(remaining_participants_window, text='These participants don\'t have times entered\n(copy if needed):')
+        remaining_participants_label.pack()
+        remaining_participants_textbox = tkinter.Text(remaining_participants_window, width=30, height=15)
+        remaining_participants_textbox.pack(pady=(0, 20))
+        remaining_participants_textbox.insert('1.0', remaining_participants)
+        remaining_participants_textbox.configure(state='disabled')
