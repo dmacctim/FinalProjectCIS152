@@ -2,7 +2,7 @@ class Participant:
     def __init__(self, name, participant_id):
         self.name = name
         self.participant_id = participant_id
-        self.scores = []
+        self.times = []
         self.average = None
 
     @property
@@ -22,12 +22,12 @@ class Participant:
         self._participant_id = value
 
     @property
-    def scores(self):
-        return self._scores
+    def times(self):
+        return self._times
 
-    @scores.setter
-    def scores(self, value):
-        self._scores = value
+    @times.setter
+    def times(self, value):
+        self._times = value
 
     @property
     def average(self):
@@ -37,14 +37,14 @@ class Participant:
     def average(self, value):
         self._average = value
 
-    def add_score(self, score):
-        self.scores.append(score)
+    def add_time(self, time):
+        self.times.append(time)
 
     def calc_average(self):
-        self.average = sum(self.scores) / len(self.scores)
+        self.average = sum(self.times) / len(self.times)
 
     def __str__(self):
-        return f'Participant Name: {self.name}\nID: {self.participant_id}\nScores: {self.scores}\nAverage Score: {self.average}'
+        return f'Participant Name: {self.name}\nID: {self.participant_id}\nTimes: {self.times}\nAverage Time: {self.average}'
 
     def __repr__(self):
-        return f'Participant(name={self.name}, id={self.participant_id}, scores={self.scores}, average={self.average})'
+        return f'Participant(name={self.name}, id={self.participant_id}, times={self.times}, average={self.average})'
