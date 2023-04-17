@@ -13,12 +13,15 @@ def get_next_participant_id():
 class App:
     def __init__(self):
         self.main_window = tkinter.Tk()
+        self.add_times_window = None
+        self.add_participant_window = None
         self.main_window.title("Rubik's Cubing Event Manager")
         self.main_window.option_add('*font', 'Arial 12')
-        self.main_window.geometry('900x500')
+        self.main_window.geometry('950x500')
         self.frame = tkinter.Frame(self.main_window)
         self.frame.pack(fill=tkinter.BOTH, expand=True, padx=20, pady=20)
         self.FONT = ('Arial', 12)
+        self.BOLD_FONT = ('Arial', 12, 'bold')
         self.participant_id_gen = get_next_participant_id()
 
         self.events = [Event(f'{i}x{i}') for i in range(2, 8)]
@@ -43,12 +46,12 @@ class App:
         self.determine_winners_button = tkinter.Button(self.frame, text='Determine Winners', font=self.FONT,
                                                        command=self.display_winners)
         self.determine_winners_button.grid(row=8, column=0, columnspan=2, pady=40)
-        self.two_by_two_results_label = tkinter.Label(self.frame, text='2x2 Results', font=self.FONT)
-        self.three_by_three_results_label = tkinter.Label(self.frame, text='3x3 Results', font=self.FONT)
-        self.four_by_four_results_label = tkinter.Label(self.frame, text='4x4 Results', font=self.FONT)
-        self.five_by_five_results_label = tkinter.Label(self.frame, text='5x5 Results', font=self.FONT)
-        self.six_by_six_results_label = tkinter.Label(self.frame, text='6x6 Results', font=self.FONT)
-        self.seven_by_seven_results_label = tkinter.Label(self.frame, text='7x7 Results', font=self.FONT)
+        self.two_by_two_results_label = tkinter.Label(self.frame, text='2x2 Results', font=self.BOLD_FONT)
+        self.three_by_three_results_label = tkinter.Label(self.frame, text='3x3 Results', font=self.BOLD_FONT)
+        self.four_by_four_results_label = tkinter.Label(self.frame, text='4x4 Results', font=self.BOLD_FONT)
+        self.five_by_five_results_label = tkinter.Label(self.frame, text='5x5 Results', font=self.BOLD_FONT)
+        self.six_by_six_results_label = tkinter.Label(self.frame, text='6x6 Results', font=self.BOLD_FONT)
+        self.seven_by_seven_results_label = tkinter.Label(self.frame, text='7x7 Results', font=self.BOLD_FONT)
         self.two_by_two_results_label.grid(row=0, column=2, columnspan=2, padx=70)
         self.three_by_three_results_label.grid(row=0, column=4, columnspan=2, padx=70)
         self.four_by_four_results_label.grid(row=0, column=6, columnspan=2, padx=70)
@@ -142,7 +145,7 @@ class App:
                 participant = event.participants[participant_index]
                 if not participant.times:
                     for time in times:
-                        participant.add_time(time)
+                        participant.add_time(float(time))
                     self.add_times_window.destroy()
                 else:
                     times_already_exist_label = tkinter.Label(self.add_times_window,
@@ -158,8 +161,24 @@ class App:
         event = self.events[self.event_names.index(self.clicked_event.get())]
 
         if event.all_times_entered():
-            # process and display winners
-            pass
+            event.calc_all_averages()
+            event.sort_participants()
+            winners = {participant.name: participant.average for participant in event.finished_participants[0:3]}
+            event_label_index = self.events.index(event)
+            winner_label_coordinates = [
+                (1, 2),
+                (1, 4),
+                (1, 6),
+                (5, 2),
+                (5, 4),
+                (5, 6)
+            ]
+            winners_text = ['1st Place: ', '2nd Place: ', '3rd Place: ']
+            for key, value, i in zip(winners.keys(), winners.values(), range(3)):
+                winners_text[i] += f'{key}, {value:0.2F}\n'
+            winner_label = tkinter.Label(self.frame, text='\n'.join(winners_text), font=self.FONT)
+            winner_label.grid(row=winner_label_coordinates[event_label_index][0],
+                              column=winner_label_coordinates[event_label_index][1], columnspan=2, rowspan=3)
         else:
             self.display_remaining_participants(event.get_remaining_participants())
 
@@ -167,7 +186,8 @@ class App:
         remaining_participants_window = tkinter.Toplevel(self.main_window)
         remaining_participants_window.wm_geometry('400x300')
 
-        remaining_participants_label = tkinter.Label(remaining_participants_window, text='These participants don\'t have times entered\n(copy if needed):')
+        remaining_participants_label = tkinter.Label(remaining_participants_window,
+                                                     text='These participants don\'t have times entered\n(copy if needed):')
         remaining_participants_label.pack()
         remaining_participants_textbox = tkinter.Text(remaining_participants_window, width=30, height=15)
         remaining_participants_textbox.pack(pady=(0, 20))
