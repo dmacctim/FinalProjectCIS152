@@ -63,7 +63,9 @@ class Event:
 
         for i in range(n):
             for j in range(0, n-i-1):
-                if self.finished_participants[j].average > self.finished_participants[j + 1].average:
+                if self.finished_participants[j + 1].average == 'DNF':
+                    continue
+                if self.finished_participants[j].average == 'DNF' or self.finished_participants[j].average > self.finished_participants[j + 1].average:
                     self.finished_participants[j], self.finished_participants[j + 1] = self.finished_participants[j + 1], self.finished_participants[j]
 
     def __str__(self):

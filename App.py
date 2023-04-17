@@ -140,12 +140,13 @@ class App:
             empty_times_label = tkinter.Label(self.add_times_window, text='Time entries cannot be empty', fg='#f00')
             empty_times_label.grid(row=7, column=1, columnspan=2)
         else:
-            if all([time.replace('.', '', 1).isnumeric() for time in times]):
+            if all([time.replace('.', '', 1).isnumeric() or time.upper() == 'DNF' for time in times]):
                 event = self.events[self.event_names.index(self.clicked_event.get())]
                 participant = event.participants[participant_index]
                 if not participant.times:
                     for time in times:
-                        participant.add_time(float(time))
+                        participant.add_time(float(time) if time.replace('.', '', 1).isnumeric() else time.upper())
+                    print(participant.times)
                     self.add_times_window.destroy()
                 else:
                     times_already_exist_label = tkinter.Label(self.add_times_window,
@@ -175,7 +176,7 @@ class App:
             ]
             winners_text = ['1st Place: ', '2nd Place: ', '3rd Place: ']
             for key, value, i in zip(winners.keys(), winners.values(), range(3)):
-                winners_text[i] += f'{key}, {value:0.2F}\n'
+                winners_text[i] += f'{key}, {value:0.2F}\n' if value != 'DNF' else f'{key}, {value}\n'
             winner_label = tkinter.Label(self.frame, text='\n'.join(winners_text), font=self.FONT)
             winner_label.grid(row=winner_label_coordinates[event_label_index][0],
                               column=winner_label_coordinates[event_label_index][1], columnspan=2, rowspan=3)

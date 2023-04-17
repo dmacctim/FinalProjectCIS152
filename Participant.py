@@ -41,7 +41,18 @@ class Participant:
         self.times.append(time)
 
     def calc_average(self):
-        self.average = sum(self.times) / len(self.times)
+        if self.times.count('DNF') > 1:
+            self.average = 'DNF'
+        elif self.times.count('DNF') == 1:
+            times_for_calc = self.times
+            times_for_calc.remove('DNF')
+            times_for_calc.remove(min(times_for_calc))
+            self.average = sum(times_for_calc) / len(times_for_calc)
+        else:
+            times_for_calc = self.times
+            times_for_calc.remove(min(self.times))
+            times_for_calc.remove(max(times_for_calc))
+            self.average = sum(times_for_calc) / len(times_for_calc)
 
     def __str__(self):
         return f'Participant Name: {self.name}\nID: {self.participant_id}\nTimes: {self.times}\nAverage Time: {self.average}'
