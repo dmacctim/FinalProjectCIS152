@@ -154,7 +154,7 @@ class App:
                                                               fg='#f00')
                     times_already_exist_label.grid(row=7, column=1, columnspan=2)
             else:
-                times_input_val_label = tkinter.Label(self.add_times_window, text='Time entries must only be numbers',
+                times_input_val_label = tkinter.Label(self.add_times_window, text='Time entries must only be numbers (or \'DNF\')',
                                                       fg='#f00')
                 times_input_val_label.grid(row=7, column=1, columnspan=2)
 
