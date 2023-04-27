@@ -49,7 +49,7 @@ class Participant:
             times_for_calc.remove(min(times_for_calc))
             self.average = sum(times_for_calc) / len(times_for_calc)
         else:
-            times_for_calc = self.times
+            times_for_calc = self.times.copy()
             times_for_calc.remove(min(self.times))
             times_for_calc.remove(max(times_for_calc))
             self.average = sum(times_for_calc) / len(times_for_calc)
