@@ -1,8 +1,27 @@
+# ***************************************************************
+# Name : Application GUI class
+# Author: Tim Ancona
+# Created : 4/11/2023
+# Course: CIS 152 - Data Structures
+# Version: 1.0
+# OS: Windows 11
+# IDE: Pycharm 2022.3.1
+# Copyright : This is my own original work
+# based on specifications issued by our instructor
+# Description : This is the main GUI class for the application.
+#            Input: none
+#            Output: none
+# Academic Honesty: I attest that this is my original work.
+# I have not used unauthorized source code, either modified or
+# unmodified. I have not given other fellow student(s) access
+# to my program.
+# ***************************************************************
 import tkinter
 from Event import Event
 from Participant import Participant
 
 
+# generates the next ID number for a participant who will be added to an event
 def get_next_participant_id():
     num = 1
     while True:
@@ -11,7 +30,9 @@ def get_next_participant_id():
 
 
 class App:
+    # initializes the main application window
     def __init__(self):
+        # declare main window and frame attributes
         self.main_window = tkinter.Tk()
         self.add_times_window = None
         self.add_participant_window = None
@@ -24,11 +45,13 @@ class App:
         self.BOLD_FONT = ('Arial', 12, 'bold')
         self.participant_id_gen = get_next_participant_id()
 
+        # declare event and clicked event attributes
         self.events = [Event(f'{i}x{i}') for i in range(2, 8)]
         self.event_names = [event.name for event in self.events]
         self.clicked_event = tkinter.StringVar()
         self.clicked_event.set(self.event_names[0])
 
+        # declare GUI components for events, participants, and winners
         self.event_label = tkinter.Label(self.frame, text='Event: ', font=self.FONT)
         self.event_label.grid(row=0, column=0, rowspan=2)
         self.event_dropdown = tkinter.OptionMenu(self.frame, self.clicked_event, *self.event_names,
@@ -59,12 +82,14 @@ class App:
         self.six_by_six_results_label.grid(row=4, column=4, columnspan=2, padx=70)
         self.seven_by_seven_results_label.grid(row=4, column=6, columnspan=2, padx=70)
 
+    # used to refresh names in the participants listbox
     def update_participants_listbox(self, event):
         selected_event_index = self.event_names.index(self.clicked_event.get())
         self.participant_listbox.delete(0, tkinter.END)
         for curr_participant in self.events[selected_event_index].participants:
             self.participant_listbox.insert(tkinter.END, curr_participant.name)
 
+    # pops up a window to enter a name for a new participant to an event
     def popup_participant(self):
         self.add_participant_window = tkinter.Toplevel(self.main_window)
         self.add_participant_window.wm_geometry('400x120')
@@ -82,6 +107,7 @@ class App:
                                        command=self.add_participant_window.destroy)
         cancel_button.grid(row=2, column=2, pady=10)
 
+    # used to add a participant to an event
     def add_participant(self, participant_name):
         if participant_name:
             participant_name = participant_name.title()
@@ -97,6 +123,7 @@ class App:
             empty_name_label = tkinter.Label(self.add_participant_window, text='Name cannot be empty', fg='#f00')
             empty_name_label.grid(row=3, column=1, columnspan=2)
 
+    # pops up a window to enter times to be added for a participant
     def popup_times(self):
         selected_participant = self.participant_listbox.curselection()[0]
         self.add_times_window = tkinter.Toplevel(self.main_window)
@@ -135,6 +162,7 @@ class App:
                                        command=self.add_times_window.destroy)
         cancel_button.grid(row=6, column=2, pady=10)
 
+    # used to add times to a participant
     def add_times(self, participant_index, times):
         if not all(times):
             empty_times_label = tkinter.Label(self.add_times_window, text='Time entries cannot be empty', fg='#f00')
@@ -158,6 +186,8 @@ class App:
                                                       fg='#f00')
                 times_input_val_label.grid(row=7, column=1, columnspan=2)
 
+    # displays the winners for an event
+    # if not all participants have competed, a list of remaining participants is displayed instead
     def display_winners(self):
         event = self.events[self.event_names.index(self.clicked_event.get())]
 
@@ -183,6 +213,7 @@ class App:
         else:
             self.display_remaining_participants(event.get_remaining_participants())
 
+    # displays a list of remaining participants
     def display_remaining_participants(self, remaining_participants):
         remaining_participants_window = tkinter.Toplevel(self.main_window)
         remaining_participants_window.wm_geometry('400x300')
